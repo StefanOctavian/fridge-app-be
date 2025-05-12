@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using BussinessLogic.Auth;
 using BussinessLogic.DTOs;
 using BussinessLogic.Services.Interfaces;
-using BussinessLogic.Entities.Enums;
+using BussinessLogic.Enums;
 
 namespace BussinessLogic.Controllers;
 

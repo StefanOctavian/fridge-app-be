@@ -36,7 +36,7 @@ public class UserService(HttpClient crudClient) : IUserService
         return CleanUser(user);
     }
 
-    public async Task<List<FridgeIngredientDTO>> GetFridge(UserDTO currentUser)
+    public async Task<List<FridgeIngredientDTO>> GetFridge(CleanUserDTO currentUser)
     {
         var fridge = await crudClient.GetAsync($"/User/{currentUser.Id}/Fridge")
             .FromJson<List<FridgeIngredientDTO>>();
@@ -44,7 +44,7 @@ public class UserService(HttpClient crudClient) : IUserService
     }
 
     public async Task<List<FridgeIngredientDTO>> PutFridge(
-        UserDTO currentUser, List<FridgePutIngredientDTO> fridge
+        CleanUserDTO currentUser, List<FridgePutIngredientDTO> fridge
     )
     {
         return await crudClient.PutAsync($"/User/{currentUser.Id}/Fridge", fridge)
@@ -52,7 +52,7 @@ public class UserService(HttpClient crudClient) : IUserService
     }
 
     public async Task<List<FridgeIngredientDTO>> UpdateFridge(
-        UserDTO currentUser, List<FridgeIngredientDeltaDTO> fridgeDelta
+        CleanUserDTO currentUser, List<FridgeIngredientDeltaDTO> fridgeDelta
     )
     {
         return await crudClient.PatchAsync($"/User/{currentUser.Id}/Fridge", fridgeDelta)

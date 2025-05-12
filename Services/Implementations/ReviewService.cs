@@ -12,20 +12,26 @@ public class ReviewService(HttpClient crudClient) : IReviewService
             .FromJson<IEnumerable<ReviewDTO>>();
     }
 
-    public async Task<ReviewDTO> AddToRecipe(UserDTO user, Guid recipeId, ReviewAddDTO reviewDto)
+    public async Task<ReviewDTO> AddToRecipe(CleanUserDTO user, Guid recipeId, ReviewAddDTO reviewDto)
     {
         return await crudClient.PostAsync($"/Recipe/{recipeId}/Review/User/{user.Id}", reviewDto)
             .FromJson<ReviewDTO>();
     }
 
-    public async Task<ReviewDTO> Update(Guid reviewId, ReviewUpdateDTO reviewDto)
+    public async Task<ReviewDTO> UpdateToRecipe(Guid userId, Guid recipeId, ReviewUpdateDTO reviewDto)
     {
+        var reviewId = await crudClient.GetAsync($"/Recipe/{recipeId}/Review/User/{userId}")
+            .FromJson<ReviewDTO>()
+            .ContinueWith(t => t.Result.Id);
         return await crudClient.PatchAsync($"/Review/{reviewId}", reviewDto)
             .FromJson<ReviewDTO>();
     }
 
-    public async Task Delete(Guid reviewId)
+    public async Task DeleteFromRecipe(Guid userId, Guid recipeId)
     {
+        var reviewId = await crudClient.GetAsync($"/Recipe/{recipeId}/Review/User/{userId}")
+            .FromJson<ReviewDTO>()
+            .ContinueWith(t => t.Result.Id);
         await crudClient.DeleteAsync($"/Review/{reviewId}").Unpack();
     }
 }

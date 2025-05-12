@@ -34,7 +34,7 @@ public class RecipeService(HttpClient crudClient) : IRecipeService
             .FromJson<List<RecipePreviewDTO>>();
     }
 
-    public async Task<List<RecipePreviewDTO>> Search(UserDTO user, RecipeFiltersDTO filters)
+    public async Task<List<RecipePreviewDTO>> Search(CleanUserDTO user, RecipeFiltersDTO filters)
     {
         var fridge = !filters.OnlyFridge ? null :
             await crudClient.GetAsync($"/User/{user.Id}/Fridge")

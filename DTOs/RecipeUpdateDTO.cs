@@ -1,4 +1,4 @@
-using BussinessLogic.Entities.Enums;
+using BussinessLogic.Enums;
 
 namespace BussinessLogic.DTOs;
 
