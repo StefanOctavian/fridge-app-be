@@ -26,4 +26,4 @@ COPY --from=build /out .
 EXPOSE 80
 
 # Set the entry point for the container
-ENTRYPOINT ["dotnet", "Auth.dll"]
+ENTRYPOINT ["dotnet", "BussinessLogic.dll"]
