@@ -14,7 +14,6 @@ public class Program
         builder.AddServices();
 
         builder.AddCorsConfiguration();
-        builder.AddCrudClient();
         builder.AddSwaggerAuthorization("Fridge App");
         builder.ConfigureAuthentication();
 
