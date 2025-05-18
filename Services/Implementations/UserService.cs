@@ -20,25 +20,25 @@ public class UserService(HttpClient crudClient) : IUserService
 
     public async Task<CleanUserDTO> GetUser(Guid id)
     {
-        var user = await crudClient.GetAsync($"/User/{id}").FromJson<UserDTO>();
+        var user = await crudClient.GetAsync($"User/{id}").FromJson<UserDTO>();
         return CleanUser(user);
     }
 
     public async Task<CleanUserDTO> GetUser(string email)
     {
-        var user = await crudClient.GetAsync($"/User?email={email}").FromJson<UserDTO>();
+        var user = await crudClient.GetAsync($"User?email={email}").FromJson<UserDTO>();
         return CleanUser(user);
     }
 
     public async Task<CleanUserDTO> UpdateUser(Guid id, UserUpdateDTO userUpdate)
     {
-        var user = await crudClient.PatchAsync($"/User/{id}", userUpdate).FromJson<UserDTO>();
+        var user = await crudClient.PatchAsync($"User/{id}", userUpdate).FromJson<UserDTO>();
         return CleanUser(user);
     }
 
     public async Task<List<FridgeIngredientDTO>> GetFridge(CleanUserDTO currentUser)
     {
-        var fridge = await crudClient.GetAsync($"/User/{currentUser.Id}/Fridge")
+        var fridge = await crudClient.GetAsync($"User/{currentUser.Id}/Fridge")
             .FromJson<List<FridgeIngredientDTO>>();
         return fridge;
     }
@@ -47,7 +47,7 @@ public class UserService(HttpClient crudClient) : IUserService
         CleanUserDTO currentUser, List<FridgePutIngredientDTO> fridge
     )
     {
-        return await crudClient.PutAsync($"/User/{currentUser.Id}/Fridge", fridge)
+        return await crudClient.PutAsync($"User/{currentUser.Id}/Fridge", fridge)
             .FromJson<List<FridgeIngredientDTO>>();
     }
 
@@ -55,7 +55,7 @@ public class UserService(HttpClient crudClient) : IUserService
         CleanUserDTO currentUser, List<FridgeIngredientDeltaDTO> fridgeDelta
     )
     {
-        return await crudClient.PatchAsync($"/User/{currentUser.Id}/Fridge", fridgeDelta)
+        return await crudClient.PatchAsync($"User/{currentUser.Id}/Fridge", fridgeDelta)
             .FromJson<List<FridgeIngredientDTO>>();
     }
 }

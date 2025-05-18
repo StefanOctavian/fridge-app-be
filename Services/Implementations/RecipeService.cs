@@ -19,28 +19,28 @@ public class RecipeService(HttpClient crudClient) : IRecipeService
 
     public async Task Add(RecipeAddDTO recipe)
     {
-        await crudClient.PostAsync("/Recipe", recipe).Unpack();
+        await crudClient.PostAsync("Recipe", recipe).Unpack();
     }
 
     public async Task<RecipeDTO> GetById(Guid id)
     {
-        return await crudClient.GetAsync($"/Recipe/{id}")
+        return await crudClient.GetAsync($"Recipe/{id}")
             .FromJson<RecipeDTO>();
     }
 
     public async Task<List<RecipePreviewDTO>> GetAll()
     {
-        return await crudClient.GetAsync("/Recipe")
+        return await crudClient.GetAsync("Recipe")
             .FromJson<List<RecipePreviewDTO>>();
     }
 
     public async Task<List<RecipePreviewDTO>> Search(CleanUserDTO user, RecipeFiltersDTO filters)
     {
         var fridge = !filters.OnlyFridge ? null :
-            await crudClient.GetAsync($"/User/{user.Id}/Fridge")
+            await crudClient.GetAsync($"User/{user.Id}/Fridge")
                 .FromJson<List<FridgeIngredientDTO>>();
 
-        var allRecipes = await crudClient.GetAsync("/Recipe?withIngredients=true")
+        var allRecipes = await crudClient.GetAsync("Recipe?withIngredients=true")
             .FromJson<List<RecipeDTO>>();
 
         var recipes = allRecipes
@@ -61,12 +61,12 @@ public class RecipeService(HttpClient crudClient) : IRecipeService
 
     public async Task<RecipeDTO> Update(Guid id, RecipeUpdateDTO recipeUpdates)
     {
-        return await crudClient.PatchAsync($"/Recipe/{id}", recipeUpdates)
+        return await crudClient.PatchAsync($"Recipe/{id}", recipeUpdates)
             .FromJson<RecipeDTO>();
     }
 
     public async Task Delete(Guid id)
     {
-        await crudClient.DeleteAsync($"/Recipe/{id}").Unpack();
+        await crudClient.DeleteAsync($"Recipe/{id}").Unpack();
     }
 }
