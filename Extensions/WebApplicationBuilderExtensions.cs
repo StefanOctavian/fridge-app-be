@@ -39,6 +39,21 @@ public static class WebApplicationBuilderExtensions
         return builder;
     }
 
+    public static WebApplicationBuilder AddCrudClient(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
+        {
+            var crudConfig = builder.Configuration
+                .GetRequiredSection(nameof(CrudConfiguration))
+                .Get<CrudConfiguration>()
+                ?? throw new Exception("The CRUD config is not set up correctly.");
+
+            client.BaseAddress = new Uri(crudConfig.BaseUrl); 
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {crudConfig.ApiKey}");
+        });
+        return builder;
+    }
+
     /// <summary>
     /// This extension method adds the controllers and JSON serialization configuration to the application builder.
     /// </summary>
@@ -47,7 +62,8 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer()
             .AddMvc()
-            .AddJsonOptions(options => {
+            .AddJsonOptions(options =>
+            {
                 options.JsonSerializerOptions.Converters.Add(new UnitJsonConverter()); // Adds a conversion for the Unit enum to/from string.
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); // Adds a conversion by name of the enums, otherwise numbers representing the enum values are used.
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; // This converts the public property names of the objects serialized to Camel case.
