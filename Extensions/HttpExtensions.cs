@@ -8,7 +8,7 @@ public static class HttpExtensions {
         PropertyNameCaseInsensitive = true
     };
     
-    private static record ServiceResponse<T>(T? Data);
+    private record ServiceResponse<T>(T Data);
 
     public static async Task<T> FromJson<T>(this Task<HttpResponseMessage> reqTask)
     {
@@ -21,10 +21,11 @@ public static class HttpExtensions {
             throw new ServerException(response.StatusCode, error!.Message);
         }
 
-        return JsonSerializer.Deserialize<ServiceResponse<T>>(json, jsonSerializerOptions)?.Data
+        ServiceResponse<T>? serviceResponse = JsonSerializer.Deserialize<ServiceResponse<T>>(json, jsonSerializerOptions)
             ?? throw new InternalServerErrorException(
                 cause: new("Failed to deserialize response")
             );
+        return serviceResponse.Data;
     }
 
     public static Task Unpack(this Task<HttpResponseMessage> reqTask) 
