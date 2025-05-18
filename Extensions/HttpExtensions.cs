@@ -7,18 +7,21 @@ public static class HttpExtensions {
     private static readonly JsonSerializerOptions jsonSerializerOptions = new() {
         PropertyNameCaseInsensitive = true
     };
+    
+    private static record ServiceResponse<T>(T? Data);
 
     public static async Task<T> FromJson<T>(this Task<HttpResponseMessage> reqTask)
     {
         var response = await reqTask;
         var json = await response.Content.ReadAsStringAsync();
 
-        if (!response.IsSuccessStatusCode) {
+        if (!response.IsSuccessStatusCode)
+        {
             var error = JsonSerializer.Deserialize<ServiceError>(json, jsonSerializerOptions);
             throw new ServerException(response.StatusCode, error!.Message);
         }
 
-        return JsonSerializer.Deserialize<T>(json, jsonSerializerOptions)
+        return JsonSerializer.Deserialize<ServiceResponse<T>>(json, jsonSerializerOptions)?.Data
             ?? throw new InternalServerErrorException(
                 cause: new("Failed to deserialize response")
             );
