@@ -24,11 +24,13 @@ public static class WebApplicationBuilderExtensions
     {
         var corsConfiguration = builder.Configuration
             .GetRequiredSection(nameof(CorsConfiguration))
-            .Get<CorsConfiguration>() 
+            .Get<CorsConfiguration>()
             ?? throw new ApplicationException("The CORS configuration needs to be set!");
 
-        builder.Services.AddCors(options => {
-            options.AddDefaultPolicy(policyBuilder => {
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policyBuilder =>
+            {
                 policyBuilder.WithOrigins(corsConfiguration.Origins) // This adds the valid origins that the browser client can have.
                     .AllowAnyHeader()
                     .AllowAnyMethod()
@@ -36,21 +38,6 @@ public static class WebApplicationBuilderExtensions
             });
         });
 
-        return builder;
-    }
-
-    public static WebApplicationBuilder AddCrudClient(this WebApplicationBuilder builder)
-    {
-        builder.Services.AddHttpClient<IAuthService, AuthService>(client =>
-        {
-            var crudConfig = builder.Configuration
-                .GetRequiredSection(nameof(CrudConfiguration))
-                .Get<CrudConfiguration>()
-                ?? throw new Exception("The CRUD config is not set up correctly.");
-
-            client.BaseAddress = new Uri(crudConfig.BaseUrl); 
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {crudConfig.ApiKey}");
-        });
         return builder;
     }
 
@@ -89,12 +76,14 @@ public static class WebApplicationBuilderExtensions
     /// </summary>
     public static WebApplicationBuilder ConfigureAuthentication(this WebApplicationBuilder builder)
     {
-        builder.Services.AddAuthentication(options => {
+        builder.Services.AddAuthentication(options =>
+        {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // This is to use the JWT token with the "Bearer" scheme
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(options => {
+        }).AddJwtBearer(options =>
+        {
             var jwtConfiguration = builder.Configuration.GetSection(nameof(JwtConfiguration))
-                .Get<JwtConfiguration>() 
+                .Get<JwtConfiguration>()
                 ?? throw new ApplicationException("The JWT configuration needs to be set!"); // Here we use the JWT configuration from the application.json.
 
             var key = Encoding.ASCII.GetBytes(jwtConfiguration.Key); // Use configured key to verify the JWT signature.
@@ -135,7 +124,7 @@ public static class WebApplicationBuilderExtensions
                 Type = ReferenceType.SecurityScheme
             }
         };
-        
+
         builder.Services.AddSwaggerGen(c =>
         {
             c.SupportNonNullableReferenceTypes();
@@ -169,16 +158,23 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddScoped<IIngredientService, IngredientService>();
         builder.Services.AddScoped<IReviewService, ReviewService>();
 
-        builder.Services.AddHttpClient<HttpClient>(client =>
-        {
-            var crudConfig = builder.Configuration
-                .GetRequiredSection(nameof(CrudConfiguration))
-                .Get<CrudConfiguration>()
-                ?? throw new Exception("The CRUD config is not set up correctly.");
+        builder.Services.AddHttpClient<IUserService, UserService>(CreateHttpClient(builder));
+        builder.Services.AddHttpClient<IRecipeService, RecipeService>(CreateHttpClient(builder));
+        builder.Services.AddHttpClient<IIngredientService, IngredientService>(CreateHttpClient(builder));
+        builder.Services.AddHttpClient<IReviewService, ReviewService>(CreateHttpClient(builder));
 
-            client.BaseAddress = new Uri(crudConfig.BaseUrl);
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {crudConfig.ApiKey}");
-        });
         return builder;
     }
+
+    private static Action<HttpClient> CreateHttpClient(WebApplicationBuilder builder)
+    => client =>
+    {
+        var crudConfig = builder.Configuration
+            .GetRequiredSection(nameof(CrudConfiguration))
+            .Get<CrudConfiguration>()
+            ?? throw new Exception("The CRUD config is not set up correctly.");
+
+        client.BaseAddress = new Uri(crudConfig.BaseUrl);
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {crudConfig.ApiKey}");
+    };
 }
